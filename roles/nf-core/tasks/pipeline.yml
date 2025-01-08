@@ -17,10 +17,10 @@
 - name: nf-core download {{ pipeline }} v{{ release }}
   command: >
     nf-core -v
-    download {{ pipeline }}
+    pipeline download {{ pipeline }}
     -d
     --compress none
-    --outdir {{ sw_path }}/{{ pipeline }}
+    --outdir {{ sw_path }}/{{ pipeline | basename }}
     --revision {{ release }}
     --container-system singularity
     --container-cache-utilisation amend
@@ -28,7 +28,7 @@
   ignore_errors: true
   args:
     chdir: "{{ sw_path }}"
-    creates: "{{ sw_path }}/{{ pipeline }}/{{ release | replace('.', '_') }}"
+    creates: "{{ sw_path }}/{{ pipeline | basename }}/{{ release | replace('.', '_') }}"
 
 - name: pull pipeline-specific images for {{ pipeline }} v{{ release }}
   command: "singularity pull --name nfcore-{{ container.0 }}.{{ container.1 }}.img {{ nf_core_container_repo }}/{{ container.0 | replace('-', ':', 1) }}.{{ container.1 }}"
@@ -46,16 +46,16 @@
 - name: create nf-core {{ pipeline }} v{{ release }} config
   template:
     src: "site.config.j2"
-    dest: "{{ ngi_pipeline_conf }}/{{ pipeline }}_{{ site }}.config"
+    dest: "{{ ngi_pipeline_conf }}/{{ pipeline | basename }}_{{ site }}.config"
 
 - name: set alias for pipeline {{ pipeline }} v{{ release }}
   lineinfile:
     dest: "{{ ngi_pipeline_conf }}/{{ bash_env_script }}"
     line: >
-          alias {{ pipeline }}='nextflow run {{ sw_path }}/{{ pipeline }}/{{ release | replace('.', '_') }}/
+          alias {{ pipeline | basename }}='nextflow run {{ sw_path }}/{{ pipeline | basename }}/{{ release | replace('.', '_') }}/
           -profile uppmax \
           -c {{ ngi_pipeline_conf }}/nextflow_miarka_{{ site }}.config \
-          -c {{ ngi_pipeline_conf }}/{{ pipeline }}_{{ site }}.config'
+          -c {{ ngi_pipeline_conf }}/{{ pipeline | basename }}_{{ site }}.config'
     backup: no
 
 - name: check if pipeline-specific include exists
@@ -64,11 +64,11 @@
     get_attributes: no
     get_checksum: no
     get_mime: no
-    path: "{{ role_path }}/tasks/{{ pipeline }}_include.yml"
+    path: "{{ role_path }}/tasks/{{ pipeline | basename }}_include.yml"
   register: include_stat
 
 - name: execute pipeline-specific includes
-  include_tasks: "{{ pipeline }}_include.yml"
+  include_tasks: "{{ pipeline | basename }}_include.yml"
   when: include_stat.stat.exists
 
 - name: Remove singularity cache directories
