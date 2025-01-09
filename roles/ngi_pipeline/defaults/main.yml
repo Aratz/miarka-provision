@@ -10,7 +10,6 @@ ngi_pipeline_config: miarka_ngi_config_{{ site }}.yaml
 rna_seq_conf: "{{ ngi_pipeline_conf }}/rnaseq_{{ site }}.config"
 bash_env_site_script: sourceme_site.sh
 
-piper_module_version: 1.5.1
 gatk_bundle_b37: "{{ reference_data_dir }}/piper_references/2016-04-07/gatk_bundle/2.8/b37/"
 igenomes_path: "{{ reference_data_dir }}/igenomes"
 

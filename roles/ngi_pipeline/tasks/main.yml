@@ -30,17 +30,6 @@
     dest: "{{ deployed_tool_versions }}"
     line: "NGI Pipeline: {{ ngi_pipeline_version }}"
 
-- name: Create ngi_resources/piper folder
-  file:
-    name: "{{ ngi_resources }}/piper"
-    state: directory
-
-- name: Deploy GATK license key
-  copy:
-    src: files/{{ gatk_key }}
-    dest: "{{ ngi_resources }}/piper/{{ gatk_key }}"
-  ignore_errors: true
-
 - name: Deploy fastqc conf for miarka
   template:
     src: fastq_screen.miarka.conf.j2
